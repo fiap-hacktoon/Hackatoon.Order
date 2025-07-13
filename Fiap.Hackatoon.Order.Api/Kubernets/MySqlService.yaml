@@ -1,0 +1,13 @@
+# Service com NodePort (acesso externo)
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  type: NodePort
+  selector:
+    app: mysql
+  ports:
+    - port: 3306
+      targetPort: 3306
+      nodePort: 30306  # Porta externa (você pode mudar, deve ser entre 30000–32767)

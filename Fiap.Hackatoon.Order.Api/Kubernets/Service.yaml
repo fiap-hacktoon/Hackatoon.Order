@@ -1,0 +1,42 @@
+# Service ClusterIP: Acesso interno (dentro do cluster)
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-api-clusterip
+spec:
+  selector:
+    app: order-api-deployment
+  ports:
+    - protocol: TCP
+      port: 80          # Porta acessada internamente
+      targetPort: 8087  # Porta do container
+  type: ClusterIP
+---
+# Service NodePort: Acesso externo básico (com IP do nó)
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-api-nodeport
+spec:
+  selector:
+    app: order-api-deployment
+  ports:
+    - protocol: TCP
+      port: 80           # Porta acessada externamente
+      targetPort: 8087   # Porta do container
+      nodePort: 30080    # Porta exposta no nó (opcional)
+  type: NodePort
+---
+# Service LoadBalancer: Acesso externo gerenciado (em nuvem)
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-api-lb
+spec:
+  selector:
+    app: order-api-deployment
+  ports:
+    - protocol: TCP
+      port: 5087           # Porta do serviço
+      targetPort: 8087   # Porta do container
+  type: LoadBalancer

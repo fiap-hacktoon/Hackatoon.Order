@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-api-deployment  # Nome do Deployment
+  annotations:
+    autor: Marcelo Cedro
+spec:  
+  selector:
+    matchLabels:
+      app: order-api
+  template:
+    metadata:
+      labels:
+        app: order-api
+    spec:
+      containers:
+      - name: order-api
+        image: maxcedro/hackatoonorder:latest
+        ports:
+        - containerPort: 8087
+        resources:
+          limits:
+            cpu: "0.5"
+            memory: 512Mi
+          requests:
+            cpu: "0.2"
+            memory: 256Mi
+        env:
+        - name: ASPNETCORE_URLS
+          value: "http://+:8087"
+        - name: ConnectionStrings__DefaultConnection
+          valueFrom:
+            secretKeyRef:
+              name: order-api-secrets
+              key: DefaultConnection
+        - name: ElasticSettings__ApiKey
+          valueFrom:
+            secretKeyRef:
+              name: order-api-secrets
+              key: ApiKey
+        - name: ElasticSettings__CloudId
+          valueFrom:
+            secretKeyRef:
+              name: order-api-secrets
+              key: CloudId
+        - name: SecretJWT
+          valueFrom:
+            secretKeyRef:
+              name: order-api-secrets
+              key: SecretJWT
+        - name: RabbitMq__UserName
+          valueFrom:
+            secretKeyRef:
+              name: order-api-secrets
+              key: User
+        - name: RabbitMq__Password
+          valueFrom:
+            secretKeyRef:
+              name: order-api-secrets
+              key: Password              
+        - name: RabbitMq__HostName
+          valueFrom:
+            configMapKeyRef: 
+              name: order-api-configmap
+              key: "Server"
+        - name: RabbitMq__Port
+          valueFrom:
+            configMapKeyRef: 
+              name: order-api-configmap
+              key: "Port"
+        
+       
