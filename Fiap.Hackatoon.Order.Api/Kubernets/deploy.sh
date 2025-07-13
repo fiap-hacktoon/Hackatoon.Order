@@ -3,7 +3,7 @@
 set -e  # Encerra o script em caso de erro
 
 echo "🔐 Aplicando Secret da aplicação..."
-kubectl apply -f app-secrets.yaml  # Adiciona o Secret
+kubectl apply -f App-secrets.yaml  # Adiciona o Secret
 
 echo "🐬 Subindo MySQL Deployment..."
 kubectl apply -f MySqlDeployment.yaml  # Aplica o MySQL Deployment
