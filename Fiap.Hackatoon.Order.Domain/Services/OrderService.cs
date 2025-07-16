@@ -1,5 +1,4 @@
-﻿using Fiap.Hackatoon.Order.Domain.Dtos.Elastic;
-using Fiap.Hackatoon.Order.Domain.Entities;
+﻿using Fiap.Hackatoon.Order.Domain.Entities;
 using Fiap.Hackatoon.Order.Domain.Interfaces.ElasticSearch;
 using Fiap.Hackatoon.Order.Domain.Interfaces.Repositories;
 using Fiap.Hackatoon.Order.Domain.Interfaces.Services;

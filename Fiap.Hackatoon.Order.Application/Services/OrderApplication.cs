@@ -1,4 +1,5 @@
-﻿using Fiap.Hackatoon.Order.Domain.Dtos.Order;
+﻿using Elastic.Transport.Extensions;
+using Fiap.Hackatoon.Order.Domain.Dtos.Order;
 using Fiap.Hackatoon.Order.Domain.Enumerators;
 using Fiap.Hackatoon.Order.Domain.Extensions;
 using Fiap.Hackatoon.Order.Domain.Interfaces.Application;
@@ -34,14 +35,14 @@ namespace Fiap.Hackatoon.Order.Application.Services
                 if (orders == null || !orders.Any())
                     return [];
 
-                // Executar em paralelo
-                var tasks = orders.Select(async order =>
+                var orderDtos = new List<OrderDto>();
+
+                foreach (var order in orders)
                 {
                     var orderProducts = await _orderProductService.GetByOrderIdAsync(order.Id);
-                    return order.ToOrderDto(orderProducts);
-                });
+                    orderDtos.Add(order.ToOrderDto(orderProducts));
+                }
 
-                var orderDtos = await Task.WhenAll(tasks);
                 return orderDtos;
             }
             catch (Exception ex)
@@ -228,10 +229,10 @@ namespace Fiap.Hackatoon.Order.Application.Services
                     return updateResult;
                 }
 
-                if (orderUpdateDto.OrderStatusId.IsInvalidStatusUpdate())
+                if (orderExist.OrderStatusId.IsInvalidStatusUpdate())
                 {
                     updateResult.Success = false;
-                    updateResult.Message = $"Pedido ja se encontra em uma situação impossivel de se alterar.";
+                    updateResult.Message = $"Pedido ja se encontra no status {orderExist.OrderStatusId.GetStringValue()} impossivel de se alterar.";
 
                     return updateResult;
                 }
@@ -266,7 +267,7 @@ namespace Fiap.Hackatoon.Order.Application.Services
 
                 var endpoint = await _bus.GetSendEndpoint(new Uri($"queue:{massTransitObject.QueueList.UpdateQueue}"));
 
-                await endpoint.Send<Domain.Dtos.Order.OrderDto>(orderUpdateDto);
+                await endpoint.Send<OrderDto>(orderUpdateDto);
 
                 updateResult.Success = true;
                 updateResult.Message = "Pedido inserido na FILA para atualizacao com sucesso.";
@@ -300,7 +301,7 @@ namespace Fiap.Hackatoon.Order.Application.Services
 
                     var endpoint = await _bus.GetSendEndpoint(new Uri($"queue:{massTransitObject.QueueList.DeleteQueue}"));
 
-                    await endpoint.Send<Domain.Dtos.Order.OrderDto>(orderExist);
+                    await endpoint.Send<OrderDto>(orderExist);
 
                     insertResult.Success = true;
                     insertResult.Message = "Contato inserido na FILA para delecao com sucesso.";

@@ -39,6 +39,7 @@ spec:
               value: grupo10
             - name: MYSQL_PASSWORD
               value: yourpassword
+          args: ["--local-infile=1"]  # ?? Ativando local_infile no MySQL
           volumeMounts:
             - name: mysql-storage
               mountPath: /var/lib/mysql
