@@ -65,7 +65,7 @@ namespace Fiap.Hackatoon.Order.Domain.Services
             try
             {
                 var orderInxedList = (await _elasticClient.GetByStatus(status, INDEX_NAME));
-                if (orderInxedList != null)
+                if (orderInxedList is not null && orderInxedList.Any())
                     return orderInxedList;
                 else                
                     return await _orderRepository.GetOrderByStatusAsync(status);                 
@@ -83,7 +83,7 @@ namespace Fiap.Hackatoon.Order.Domain.Services
             try
             {
                 var orderInxedList = (await _elasticClient.GetByClientId(clientId, INDEX_NAME));
-                if (orderInxedList != null)
+                if (orderInxedList is not null && orderInxedList.Any())
                     return orderInxedList;
                 else                                    
                     return  await _orderRepository.GetByClientAsync(clientId);                
@@ -101,7 +101,7 @@ namespace Fiap.Hackatoon.Order.Domain.Services
             try
             {
                 var orderInxedList = (await _elasticClient.GetByEmployeeId(employeeId, INDEX_NAME));
-                if (orderInxedList != null)
+                if (orderInxedList is not null && orderInxedList.Any())
                     return orderInxedList;
                 else                
                     return await _orderRepository.GetByEmployeeAsync(employeeId);                    

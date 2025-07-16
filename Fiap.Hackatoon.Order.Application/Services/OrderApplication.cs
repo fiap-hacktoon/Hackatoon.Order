@@ -73,11 +73,18 @@ namespace Fiap.Hackatoon.Order.Application.Services
         {
             try
             {
-                var order = await _orderService.GetOrdersByStatusIdAsync(status);
-                if (order == null)
+                var orders = await _orderService.GetOrdersByStatusIdAsync(status);
+                if (orders == null)
                     return null;
 
-                return order.ToOrderDtoList();
+                var tasks = orders.Select(async order =>
+                {
+                    var orderProducts = await _orderProductService.GetByOrderIdAsync(order.Id);
+                    return order.ToOrderDto(orderProducts);
+                });
+
+                var orderDtos = await Task.WhenAll(tasks);
+                return orderDtos;
             }
             catch (Exception e)
             {
@@ -86,15 +93,22 @@ namespace Fiap.Hackatoon.Order.Application.Services
             }
         }
 
-        public async Task<IEnumerable<Domain.Dtos.Order.OrderDto>> GetOrderByEmployeeIdAsync(int id)
+        public async Task<IEnumerable<OrderDto>> GetOrderByEmployeeIdAsync(int id)
         {
             try
             {
-                var order = await _orderService.GetOrderByEmployeeIdAsync(id);
-                if (order == null)
+                var orders = await _orderService.GetOrderByEmployeeIdAsync(id);
+                if (orders == null)
                     return null;
 
-                return order.ToOrderDtoList();
+                var tasks = orders.Select(async order =>
+                {
+                    var orderProducts = await _orderProductService.GetByOrderIdAsync(order.Id);
+                    return order.ToOrderDto(orderProducts);
+                });
+
+                var orderDtos = await Task.WhenAll(tasks);
+                return orderDtos;
             }
             catch (Exception e)
             {
@@ -107,11 +121,18 @@ namespace Fiap.Hackatoon.Order.Application.Services
         {
             try
             {
-                var order = await _orderService.GetOrderByClientIdAsync(id);
-                if (order == null)
+                var orders = await _orderService.GetOrderByClientIdAsync(id);
+                if (orders == null)
                     return null;
 
-                return order.ToOrderDtoList();
+                var tasks = orders.Select(async order =>
+                {
+                    var orderProducts = await _orderProductService.GetByOrderIdAsync(order.Id);
+                    return order.ToOrderDto(orderProducts);
+                });
+
+                var orderDtos = await Task.WhenAll(tasks);
+                return orderDtos;
             }
             catch (Exception e)
             {

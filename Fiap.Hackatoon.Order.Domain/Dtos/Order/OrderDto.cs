@@ -22,7 +22,7 @@ namespace Fiap.Hackatoon.Order.Domain.Dtos.Order
         [Required(ErrorMessage = "Preço final é obrigatório.")]
         public required decimal FinalPrice { get; set; }
 
-        public string Comments { get; set; }
+        public string? Comments { get; set; }
 
         public DateTime Creation { get; set; }
 

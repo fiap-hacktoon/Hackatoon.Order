@@ -38,9 +38,10 @@ namespace Fiap.Hackatoon.Order.Domain.Extensions
                 FinalPrice = orderEntity.FinalPrice,
                 Creation = orderEntity.Creation,
                 LastUpdate = orderEntity.LastUpdate,
+                Comments = orderEntity.Comments,
                 Products = orderProducts.Where(op => op != null)
-                                             .Select(op => op!.ToOrderProductDto())
-                                             .ToList()
+                                        .Select(op => op!.ToOrderProductDto())
+                                        .ToList()
             };
 
             return order;
