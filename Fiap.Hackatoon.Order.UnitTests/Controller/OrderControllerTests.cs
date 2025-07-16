@@ -38,6 +38,7 @@ namespace Fiap.Hackatoon.Order.UnitTests.Controller
                     ClientId = 123,
                     OrderStatusId = OrderStatus.Pendente,
                     EmployeeId = 123,
+                    DeliveryModeId = DeliveryMode.Delivery,
                     FinalPrice = 123.10m
                 }
             };
@@ -61,7 +62,8 @@ namespace Fiap.Hackatoon.Order.UnitTests.Controller
                 ClientId = 123,
                 OrderStatusId = OrderStatus.Pendente,
                 EmployeeId = 123,
-                FinalPrice = 123.10m
+                FinalPrice = 123.10m,
+                DeliveryModeId = DeliveryMode.Delivery
             };
 
             _orderAppMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(dto);
@@ -90,7 +92,8 @@ namespace Fiap.Hackatoon.Order.UnitTests.Controller
                 ClientId = 123,
                 OrderStatusId = OrderStatus.Pendente,
                 EmployeeId = 123,
-                FinalPrice = 123.10m
+                FinalPrice = 123.10m,
+                DeliveryModeId = DeliveryMode.Delivery
             };
 
             var orders = new List<OrderDto> { dto };
@@ -107,7 +110,8 @@ namespace Fiap.Hackatoon.Order.UnitTests.Controller
             var dto = new OrderCreateDto
             { 
                 ClientId = 123, 
-                EmployeeId = 456
+                EmployeeId = 456,
+                DeliveryModeId = DeliveryMode.Delivery
             };
 
             _orderAppMock.Setup(x => x.AddOrderMassTransitAsync(dto)).ReturnsAsync(new UpsertOrderResponse { Success = true, Message = "Pedido criado" });
@@ -123,7 +127,8 @@ namespace Fiap.Hackatoon.Order.UnitTests.Controller
             var dto = new OrderCreateDto
             {
                 ClientId = 123,
-                EmployeeId = 456
+                EmployeeId = 456,
+                DeliveryModeId = DeliveryMode.Delivery
             };
 
             _orderAppMock.Setup(x => x.AddOrderMassTransitAsync(dto)).ReturnsAsync(new UpsertOrderResponse { Success = false, Message = "Erro" });
@@ -147,15 +152,16 @@ namespace Fiap.Hackatoon.Order.UnitTests.Controller
         [Fact]
         public async Task UpdateOrder_ShouldReturnBadRequest_WhenFails()
         {
-            var dto = new OrderDto
+            var dto = new OrderUpdateDto
             { 
                 Id = "123",
                 ClientId = 123,
                 EmployeeId = 456,
+                DeliveryModeId = DeliveryMode.Delivery,
                 OrderStatusId = OrderStatus.EmPreparacao,
                 FinalPrice = 100.09m
             };
-            _orderAppMock.Setup(x => x.UpdateOrderMassTransitAsync(dto)).ReturnsAsync(new UpsertOrderResponse { Success = false, Message = "Falha" });
+            _orderAppMock.Setup(x => x.UpdateOrderMassTransitAsync(dto, false)).ReturnsAsync(new UpsertOrderResponse { Success = false, Message = "Falha" });
 
             var result = await _controller.UpdateOrder(dto);
 

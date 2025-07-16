@@ -43,6 +43,7 @@ namespace Fiap.Hackatoon.Order.UnitTests.Domain
                 new() { 
                     Id = "1",
                     ClientId = 123,
+                    DeliveryModeId = 1,
                     EmployeeId = 456,
                     OrderStatusId = 1
                 } 
@@ -166,6 +167,7 @@ namespace Fiap.Hackatoon.Order.UnitTests.Domain
                 {
                     Id = "123",
                     ClientId = clientId,
+                    DeliveryModeId = 1,
                     EmployeeId = employeeId,
                     OrderStatusId = orderStatus
                 }

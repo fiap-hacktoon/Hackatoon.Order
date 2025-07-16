@@ -37,14 +37,16 @@ namespace Fiap.Hackatoon.Order.Application
 
                 User = configuration.GetSection("MassTransit")["User"] ?? string.Empty,
 
-                Password = configuration.GetSection("MassTransit")["Password"] ?? string.Empty
+                Password = configuration.GetSection("MassTransit")["Password"] ?? string.Empty,
+
+                Port = configuration.GetSection("MassTransit")["Port"] ?? string.Empty,
             };
 
             service.AddMassTransit(x =>
             {
                 x.UsingRabbitMq((context, cfg) =>
                 {
-                    cfg.Host(massTransitConfig.Server, 30672, "/", h =>
+                    cfg.Host(massTransitConfig.Server, massTransitConfig.Port, "/", h =>
                     {
                         h.Username(massTransitConfig.User);
                         h.Password(massTransitConfig.Password);

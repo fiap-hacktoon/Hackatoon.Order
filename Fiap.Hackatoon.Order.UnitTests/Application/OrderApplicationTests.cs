@@ -1,6 +1,7 @@
 ﻿using Fiap.Hackatoon.Order.Application.Services;
 using Fiap.Hackatoon.Order.Domain.Dtos.Order;
 using Fiap.Hackatoon.Order.Domain.Entities;
+using Fiap.Hackatoon.Order.Domain.Enumerators;
 using Fiap.Hackatoon.Order.Domain.Interfaces.Services;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
@@ -44,6 +45,7 @@ public class OrderApplicationTests
             {
                 Id = "1",
                 ClientId = 100,
+                DeliveryModeId = 2,
                 OrderStatusId = 1,
                 EmployeeId = 200,
                 FinalPrice = 99.99m,
@@ -111,6 +113,7 @@ public class OrderApplicationTests
             Id = "123",
             ClientId = 101,
             OrderStatusId = 2,
+            DeliveryModeId = 2,
             EmployeeId = 202,
             FinalPrice = 149.99m,
             Accepted = 1,
@@ -170,6 +173,7 @@ public class OrderApplicationTests
         {
             ClientId = 1,
             EmployeeId = 1,
+            DeliveryModeId = DeliveryMode.Delivery,
             Products =
             [
                 new ()

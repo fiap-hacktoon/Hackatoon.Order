@@ -5,11 +5,11 @@ metadata:
   name: order-api-clusterip
 spec:
   selector:
-    app: order-api-deployment
+    app: order-api        # <-- corrigido para casar com o Deployment
   ports:
     - protocol: TCP
-      port: 80          # Porta acessada internamente
-      targetPort: 8087  # Porta do container
+      port: 80            # Porta que outros serviços dentro do cluster usarão
+      targetPort: 8087    # Porta do container da aplicação
   type: ClusterIP
 ---
 # Service NodePort: Acesso externo básico (com IP do nó)
@@ -19,12 +19,12 @@ metadata:
   name: order-api-nodeport
 spec:
   selector:
-    app: order-api-deployment
+    app: order-api        # <-- corrigido
   ports:
     - protocol: TCP
-      port: 80           # Porta acessada externamente
-      targetPort: 8087   # Porta do container
-      nodePort: 30080    # Porta exposta no nó (opcional)
+      port: 80
+      targetPort: 8087
+      nodePort: 30080
   type: NodePort
 ---
 # Service LoadBalancer: Acesso externo gerenciado (em nuvem)
@@ -34,9 +34,9 @@ metadata:
   name: order-api-lb
 spec:
   selector:
-    app: order-api-deployment
+    app: order-api        # <-- corrigido
   ports:
     - protocol: TCP
-      port: 5087           # Porta do serviço
-      targetPort: 8087   # Porta do container
+      port: 5087          # Porta exposta externamente via LoadBalancer
+      targetPort: 8087
   type: LoadBalancer

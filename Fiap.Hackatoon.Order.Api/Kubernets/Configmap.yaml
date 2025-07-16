@@ -3,7 +3,12 @@ kind: ConfigMap
 metadata:
   name: order-api-configmap
 data:
-  ConnectionStrings__DefaultConnection: "Server=mysql;Port=3306;Database=ContactsDb;User=grupo10;Password=yourpassword;"
+  ConnectionStrings__DefaultConnection: "Server=mysql;Port=3306;Database=OrdersDb;User=grupo10;Password=yourpassword;"
   SecretJWT: "MBAFIAPabcdefghijlmnopqrstuvxz123456789"
-  Server: "rabbitmq-clusterip"
-  Port: "5672"
+  MassTransit__Server: "rabbitmq-clusterip"
+  MassTransit__Port: "5672"
+  MassTransit__User: "myuser"
+  MassTransit__Password: "mypassword"
+  MassTransit__QueueList__InsertQueue: "order.insert"
+  MassTransit__QueueList__UpdateQueue: "order.update"
+  MassTransit__QueueList__DeleteQueue: "order.delete"
