@@ -1,31 +1,12 @@
 ﻿using Fiap.Hackatoon.Order.Domain.Dtos.Order;
 using Fiap.Hackatoon.Order.Domain.Entities;
 using Fiap.Hackatoon.Order.Domain.Enumerators;
+using MassTransit.Riders;
 
 namespace Fiap.Hackatoon.Order.Domain.Extensions
 {
     public static class OrderExtensions
     {
-        public static IEnumerable<OrderDto> ToOrderDtoList(this IEnumerable<OrderEntity> orderEntities)
-        {
-            var ordersDto = new List<OrderDto>();
-
-            foreach (var order in orderEntities)
-                ordersDto.Add(new OrderDto
-                {
-                    Id = order.Id,
-                    ClientId = order.ClientId,
-                    OrderStatusId = (OrderStatus)order.OrderStatusId,
-                    EmployeeId = order.EmployeeId,
-                    Accepted = order.Accepted,
-                    FinalPrice = order.FinalPrice,
-                    Creation = DateTime.UtcNow.AddHours(-3),
-                    Comments = order.Comments
-                });
-
-            return ordersDto;
-        }
-
         public static OrderDto ToOrderDto(this OrderEntity orderEntity, IEnumerable<OrderProduct?> orderProducts)
         {
             var order = new OrderDto
@@ -34,6 +15,7 @@ namespace Fiap.Hackatoon.Order.Domain.Extensions
                 ClientId = orderEntity.ClientId,
                 OrderStatusId = (OrderStatus)orderEntity.OrderStatusId,
                 EmployeeId = orderEntity.EmployeeId,
+                DeliveryModeId = (DeliveryMode)orderEntity.DeliveryModeId,
                 Accepted = orderEntity.Accepted,
                 FinalPrice = orderEntity.FinalPrice,
                 Creation = orderEntity.Creation,
@@ -59,6 +41,15 @@ namespace Fiap.Hackatoon.Order.Domain.Extensions
                 LastUpdate = orderProduct.LastUpdate
             };
 
+        public static OrderProductUpdateDto ToOrderProductUpdateDto(this OrderProductDto orderProduct)
+            => new()
+            {
+                OrderId = orderProduct.OrderId,
+                ProductId = orderProduct.ProductId,
+                Quantity = orderProduct.Quantity,
+                OrderPrice = orderProduct.OrderPrice,
+            };
+
         public static ProductDto ToProductDto(this Product product)
             => new()
             {
@@ -81,6 +72,7 @@ namespace Fiap.Hackatoon.Order.Domain.Extensions
                         OrderStatusId = (int)orderDto.OrderStatusId,
                         EmployeeId = orderDto.EmployeeId,
                         Comments = orderDto.Comments,
+                        DeliveryModeId = (int)orderDto.DeliveryModeId,
                         Creation = orderDto.Creation,
                         LastUpdate = DateTime.UtcNow.AddHours(-3)
                     };
@@ -93,23 +85,55 @@ namespace Fiap.Hackatoon.Order.Domain.Extensions
                 OrderStatusId = (int)orderDto.OrderStatusId,
                 EmployeeId = orderDto.EmployeeId,
                 Accepted = orderDto.Accepted,
+                DeliveryModeId = (int)orderDto.DeliveryModeId,
                 FinalPrice = orderDto.FinalPrice,
                 Comments = orderDto.Comments,
                 Creation = orderDto.Creation,
                 LastUpdate = DateTime.UtcNow.AddHours(-3)
             };
 
-        public static OrderDto ToOrderEvalueatedDto(this OrderDto order, bool accepted, string comments)
+        public static OrderUpdateDto ToOrderEvalueatedDto(this OrderDto orderDto, bool accepted, string comments)
         {
-            order.Accepted = accepted ? 1 : 0;
-            order.LastUpdate = DateTime.UtcNow.AddHours(-3);
-            order.Comments = comments;
-            order.OrderStatusId = order.Accepted == 1 ?
-                                  OrderStatus.EmPreparacao :
-                                  OrderStatus.Reprovado;
-            order.Evaluation = true;
+            var orderUpdate = new OrderUpdateDto
+            {
+                Id = orderDto.Id,
+                ClientId = orderDto.ClientId,
+                OrderStatusId = accepted ?
+                                OrderStatus.EmPreparacao :
+                                OrderStatus.Reprovado,
+                EmployeeId = orderDto.EmployeeId,
+                DeliveryModeId = (DeliveryMode)orderDto.DeliveryModeId,
+                Accepted = accepted ? 1 : 0,
+                FinalPrice = orderDto.FinalPrice,
+                Creation = orderDto.Creation,
+                Comments = comments,
+                Products = orderDto.Products.Where(op => op != null)
+                                            .Select(op => op!.ToOrderProductUpdateDto())
+                                            .ToList()
+            };
 
-            return order;
+            return orderUpdate;
+        }
+
+        public static OrderUpdateDto ToOrderChangeStatusdDto(this OrderDto orderDto, OrderStatus orderStatus)
+        {
+            var orderUpdate = new OrderUpdateDto
+            {
+                Id = orderDto.Id,
+                ClientId = orderDto.ClientId,
+                OrderStatusId = orderStatus,
+                EmployeeId = orderDto.EmployeeId,
+                DeliveryModeId = orderDto.DeliveryModeId,
+                Accepted = orderDto.Accepted,
+                FinalPrice = orderDto.FinalPrice,
+                Creation = orderDto.Creation,
+                Comments = orderDto.Comments,
+                Products = orderDto.Products.Where(op => op != null)
+                                            .Select(op => op!.ToOrderProductUpdateDto())
+                                            .ToList()
+            };
+
+            return orderUpdate;
         }
 
         public static bool IsInvalidStatusUpdate(this OrderStatus valor)

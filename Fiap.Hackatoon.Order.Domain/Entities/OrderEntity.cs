@@ -20,6 +20,9 @@ namespace Fiap.Hackatoon.Order.Domain.Entities
 
         public int? Accepted { get; set; }
 
+        [Required(ErrorMessage = "Meio de entrega do Pedido é obrigatório.")]
+        public required int DeliveryModeId { get; set; }
+
         [Required(ErrorMessage = "Preço final é obrigatório.")]
         public decimal FinalPrice { get; set; }
 

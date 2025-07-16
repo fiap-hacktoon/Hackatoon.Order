@@ -2,8 +2,6 @@
 {
     public enum OrderStatus
     {
-        Desconhecido = 0,
-
         Pendente = 1,
 
         Entregue = 2,

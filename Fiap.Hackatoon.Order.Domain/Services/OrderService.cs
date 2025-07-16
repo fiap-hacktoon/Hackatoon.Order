@@ -112,53 +112,5 @@ namespace Fiap.Hackatoon.Order.Domain.Services
                 throw new Exception(message);
             }
         }
-
-        public async Task InsertAsync(OrderEntity order)
-        {
-            try
-            {
-                await _orderRepository.AddAsync(order);
-
-                //await _elasticClient.Create(order, INDEX_NAME);
-            }
-            catch (Exception)
-            {
-                var message = "Some error occour when trying to insert new Order.";
-                _logger.LogError(message);
-                throw new Exception(message);
-            }
-        }
-
-        public async Task DeleteAsync(OrderEntity order)
-        {
-            try
-            {
-                await _orderRepository.DeleteAsync(order);
-
-                await _elasticClient.Delete(order.Id.ToString(), INDEX_NAME);
-            }
-            catch (Exception)
-            {
-                var message = "Some error occour when trying to delete a Order.";
-                _logger.LogError(message);
-                throw new Exception(message);
-            }
-        }
-
-        public async Task UpdateAsync(OrderEntity order)
-        {
-            try
-            {
-                await _orderRepository.UpdateAsync(order);
-
-                //await _elasticClient.Replace(order.Id.ToString(), order, INDEX_NAME);
-            }
-            catch (Exception)
-            {
-                var message = "Some error occour when trying to update a Order.";
-                _logger.LogError(message);
-                throw new Exception(message);
-            }
-        }
     }
 }

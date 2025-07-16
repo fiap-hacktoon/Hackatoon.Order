@@ -2,13 +2,19 @@ using Fiap.Hackatoon.Order.Api.IoC;
 using Fiap.Hackatoon.Order.Api.Logging;
 using Fiap.Hackatoon.Order.Api.Middleware;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
 using Prometheus;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDependencyResolver(builder.Configuration);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHealthChecks().ForwardToPrometheus();
@@ -25,10 +31,10 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "TechChallenge Hackathon FIAP 2025", Version = "v1" });
 
-    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var teste = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}";
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var teste = $"{Assembly.GetExecutingAssembly().GetName().Name}";
 
-    var xmlPath = System.IO.Path.Combine(System.AppContext.BaseDirectory, xmlFile);
+    var xmlPath = Path.Combine(System.AppContext.BaseDirectory, xmlFile);
     c.IncludeXmlComments(xmlPath);
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

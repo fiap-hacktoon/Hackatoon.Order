@@ -14,6 +14,8 @@ namespace Fiap.Hackatoon.Order.Domain.Dtos.Order
         [Required(ErrorMessage = "Situacao do Pedido é obrigatório.")]
         public required OrderStatus OrderStatusId { get; set; }
 
+        public required DeliveryMode DeliveryModeId { get; set; }
+
         [Required(ErrorMessage = "Id do Funcionario é obrigatório.")]
         public required int EmployeeId { get; set; }
 
@@ -29,7 +31,5 @@ namespace Fiap.Hackatoon.Order.Domain.Dtos.Order
         public DateTime? LastUpdate { get; set; }
 
         public List<OrderProductDto> Products { get; set; }
-
-        public bool Evaluation { get; set; } = false;
     }
 }

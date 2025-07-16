@@ -156,7 +156,34 @@ namespace Fiap.Hackatoon.Order.Application.Services
                 else
                 {
                     var evaluatedOrderDto = orderExist.ToOrderEvalueatedDto(accepted, comments);
-                    await UpdateOrderMassTransitAsync(evaluatedOrderDto);
+                    await UpdateOrderMassTransitAsync(evaluatedOrderDto, accepted);
+                }
+            }
+            catch (Exception e)
+            {
+                insertResult.Success = false;
+                insertResult.Message = $"Ocorreu um problema ao tentar avaliar um pedido.";
+                _logger.LogError(insertResult.Message, e);
+            }
+
+            return insertResult;
+        }
+
+        public async Task<UpsertOrderResponse> ChangeOrderStatus(string id, OrderStatus orderStatus)
+        {
+            var insertResult = new UpsertOrderResponse();
+            try
+            {
+                var orderExist = await GetOrderByIdAsync(id);
+                if (orderExist == null)
+                {
+                    insertResult.Success = false;
+                    insertResult.Message = $"Pedido inexistente na base de dados para atualizacao.";
+                }
+                else
+                {
+                    var changeOrderDto = orderExist.ToOrderChangeStatusdDto(orderStatus);
+                    await UpdateOrderMassTransitAsync(changeOrderDto, true);
                 }
             }
             catch (Exception e)
@@ -181,17 +208,17 @@ namespace Fiap.Hackatoon.Order.Application.Services
                 return insertResult;
             }
 
-            foreach (var product in orderCreateDto.Products)
-            {
-                var validatedProduct = await _orderProductService.ValidateProduct(product.ProductId.ToString());
-                if (validatedProduct is null)
-                {
-                    insertResult.Success = false;
-                    insertResult.Message = $"Produto de Id {product.ProductId} não existente no banco de dados.";
-                    _logger.LogWarning(insertResult.Message);
-                    break;
-                }
-            }
+            //foreach (var product in orderCreateDto.Products)
+            //{
+            //    var validatedProduct = await _orderProductService.ValidateProduct(product.ProductId.ToString());
+            //    if (validatedProduct is null)
+            //    {
+            //        insertResult.Success = false;
+            //        insertResult.Message = $"Produto de Id {product.ProductId} não existente no banco de dados.";
+            //        _logger.LogWarning(insertResult.Message);
+            //        return insertResult;
+            //    }
+            //}
 
             try
             {
@@ -214,11 +241,11 @@ namespace Fiap.Hackatoon.Order.Application.Services
             return insertResult;
         }
 
-        public async Task<UpsertOrderResponse> UpdateOrderMassTransitAsync(OrderDto orderUpdateDto)
+        public async Task<UpsertOrderResponse> UpdateOrderMassTransitAsync(OrderUpdateDto orderUpdateDto, bool evaluation = false)
         {
             var updateResult = new UpsertOrderResponse();
 
-            if (!orderUpdateDto.Evaluation)
+            if (!evaluation)
             {
                 var orderExist = await GetOrderByIdAsync(orderUpdateDto.Id);
                 if (orderExist == null)
@@ -247,17 +274,17 @@ namespace Fiap.Hackatoon.Order.Application.Services
                         return updateResult;
                     }
 
-                    foreach (var product in orderUpdateDto.Products)
-                    {
-                        var validatedProduct = _orderProductService.ValidateProduct(product.Id.ToString());
-                        if (validatedProduct is null)
-                        {
-                            updateResult.Success = false;
-                            updateResult.Message = $"Produto de Id {product.Id} não existente no banco de dados.";
-                            _logger.LogWarning(updateResult.Message);
-                            break;
-                        }
-                    }
+                    //foreach (var product in orderUpdateDto.Products)
+                    //{
+                    //    var validatedProduct = _orderProductService.ValidateProduct(product.ProductId.ToString());
+                    //    if (validatedProduct is null)
+                    //    {
+                    //        updateResult.Success = false;
+                    //        updateResult.Message = $"Produto de Id {product.ProductId} não existente no banco de dados.";
+                    //        _logger.LogWarning(updateResult.Message);
+                    //        break;
+                    //    }
+                    //}
                 }
             }
 
@@ -267,7 +294,7 @@ namespace Fiap.Hackatoon.Order.Application.Services
 
                 var endpoint = await _bus.GetSendEndpoint(new Uri($"queue:{massTransitObject.QueueList.UpdateQueue}"));
 
-                await endpoint.Send<OrderDto>(orderUpdateDto);
+                await endpoint.Send<OrderUpdateDto>(orderUpdateDto);
 
                 updateResult.Success = true;
                 updateResult.Message = "Pedido inserido na FILA para atualizacao com sucesso.";
@@ -315,45 +342,6 @@ namespace Fiap.Hackatoon.Order.Application.Services
             }
 
             return insertResult;
-        }
-
-        public async Task AddOrderAsync(OrderCreateDto orderCreateDto)
-        {
-            try
-            {
-                await _orderService.InsertAsync(orderCreateDto.ToAddEntity());
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e.Message);
-                throw new Exception(e.Message);
-            }
-        }
-
-        public async Task DeleteOrderAsync(OrderDto orderDto)
-        {
-            try
-            {
-                await _orderService.DeleteAsync(orderDto.ToEntity());
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e.Message);
-                throw new Exception(e.Message);
-            }
-        }
-
-        public async Task UpdateOrderAsync(OrderDto orderDto)
-        {
-            try
-            {
-                await _orderService.UpdateAsync(orderDto.ToEntity());
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e.Message);
-                throw new Exception(e.Message);
-            }
         }
     }
 }

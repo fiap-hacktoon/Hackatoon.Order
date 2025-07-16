@@ -1,4 +1,5 @@
 ﻿using Fiap.Hackatoon.Order.Domain.Dtos.Order;
+using Fiap.Hackatoon.Order.Domain.Enumerators;
 
 namespace Fiap.Hackatoon.Order.Domain.Interfaces.Application
 {
@@ -18,14 +19,10 @@ namespace Fiap.Hackatoon.Order.Domain.Interfaces.Application
 
         Task<UpsertOrderResponse> EvaluateOrder(string id, bool accepted, string comments);
 
-        Task<UpsertOrderResponse> UpdateOrderMassTransitAsync(OrderDto orderUpdateDto);
+        Task<UpsertOrderResponse> UpdateOrderMassTransitAsync(OrderUpdateDto orderUpdateDto, bool evaluation = false);
 
         Task<UpsertOrderResponse> DeleteOrderMassTransitAsync(string id);
 
-        Task AddOrderAsync(OrderCreateDto orderCreateDto);
-
-        Task DeleteOrderAsync(OrderDto orderDto);
-
-        Task UpdateOrderAsync(OrderDto orderDto);
+        Task<UpsertOrderResponse> ChangeOrderStatus(string id, OrderStatus orderStatus);
     }
 }

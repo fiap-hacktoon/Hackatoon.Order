@@ -12,6 +12,8 @@ namespace Fiap.Hackatoon.Order.Domain.Dtos.Order
         [JsonIgnore]
         public OrderStatus OrderStatusId { get; set; } = OrderStatus.Pendente;
 
+        public required DeliveryMode DeliveryModeId { get; set; }
+
         [Required(ErrorMessage = "Id do Funcionario é obrigatório.")]
         public required int EmployeeId { get; set; }
 

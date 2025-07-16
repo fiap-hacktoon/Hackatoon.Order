@@ -1,4 +1,5 @@
 ﻿using Fiap.Hackatoon.Order.Domain.Dtos.Order;
+using Fiap.Hackatoon.Order.Domain.Enumerators;
 using Fiap.Hackatoon.Order.Domain.Interfaces.Application;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -88,7 +89,7 @@ namespace Fiap.Hackatoon.Order.Api.Controllers
 
         [HttpPut]
         [Authorize(Roles = "Manager,Attendant,Kitchen,Client")]
-        public async Task<ActionResult<UpsertOrderResponse>> UpdateOrder([FromBody] OrderDto dto)
+        public async Task<ActionResult<UpsertOrderResponse>> UpdateOrder([FromBody] OrderUpdateDto dto)
         {
             _logger.LogInformation("Atualizando pedido");
             var result = await _orderService.UpdateOrderMassTransitAsync(dto);
@@ -104,6 +105,18 @@ namespace Fiap.Hackatoon.Order.Api.Controllers
         {
             _logger.LogInformation("Excluindo pedido");
             var result = await _orderService.DeleteOrderMassTransitAsync(id);
+            if (result.Success)
+                return Ok(result.Message);
+            else
+                return BadRequest(result.Message);
+        }
+
+        [HttpPut("status/{id}")]
+        [Authorize(Roles = "Manager,Attendant,Kitchen")]
+        public async Task<ActionResult<UpsertOrderResponse>> UpdateOrderStatus(string id, [FromQuery] OrderStatus orderStatus)
+        {
+            _logger.LogInformation("Atualizando pedido");
+            var result = await _orderService.ChangeOrderStatus(id, orderStatus);
             if (result.Success)
                 return Ok(result.Message);
             else

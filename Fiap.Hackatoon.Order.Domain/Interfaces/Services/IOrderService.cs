@@ -13,11 +13,5 @@ namespace Fiap.Hackatoon.Order.Domain.Interfaces.Services
         Task<IEnumerable<OrderEntity>> GetOrderByClientIdAsync(int clientId);
 
         Task<IEnumerable<OrderEntity>> GetOrderByEmployeeIdAsync(int employeeId);
-
-        Task InsertAsync(OrderEntity order);
-
-        Task DeleteAsync(OrderEntity order);
-
-        Task UpdateAsync(OrderEntity order);
     }
 }
