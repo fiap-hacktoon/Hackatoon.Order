@@ -1,28 +1,31 @@
-#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+# Use the official .NET 8 SDK image as the build environment
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER app
+# Set the working directory
 WORKDIR /app
-EXPOSE 8087
-ENV ASPNETCORE_ENVIRONMENT=Development
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["Fiap.Hackatoon.Order.Api/Fiap.Hackatoon.Order.Api.csproj", "Fiap.Hackatoon.Order.Api/"]
-COPY ["Fiap.Hackatoon.Order.Application/Fiap.Hackatoon.Order.Application.csproj", "Fiap.Hackatoon.Order.Application/"]
-COPY ["Fiap.Hackatoon.Order.Domain/Fiap.Hackatoon.Order.Domain.csproj", "Fiap.Hackatoon.Order.Domain/"]
-COPY ["Fiap.Hackatoon.Order.Infrastructure/Fiap.Hackatoon.Order.Infrastructure.csproj", "Fiap.Hackatoon.Order.Infrastructure/"]
-RUN dotnet restore "./Fiap.Hackatoon.Order.Api/Fiap.Hackatoon.Order.Api.csproj"
-COPY . .
-WORKDIR "/src/Fiap.Hackatoon.Order.Api"
-RUN dotnet build "./Fiap.Hackatoon.Order.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
+# Copy the project files
+COPY . ./
 
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Fiap.Hackatoon.Order.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+# Restore the dependencies
+RUN dotnet restore
 
-FROM base AS final
+# Build the project
+RUN dotnet publish -c Release -o out
+
+# Use the official .NET 8 runtime image as the runtime environment
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
+
+# Set the working directory
 WORKDIR /app
-COPY --from=publish /app/publish .
+
+# Copy the build output from the build environment
+COPY --from=build-env /app/out .
+
+# Expose the port the app runs on
+EXPOSE 8092
+
+ENV ASPNETCORE_ENVIRONMENT=Docker
+
+# Set the entry point for the container
 ENTRYPOINT ["dotnet", "Fiap.Hackatoon.Order.Api.dll"]
