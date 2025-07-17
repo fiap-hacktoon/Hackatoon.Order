@@ -10,7 +10,7 @@
 
         public string Password { get; set; }
 
-        public string Port { get; set; }
+        public ushort Port { get; set; }
     }
 
     public class Queues
